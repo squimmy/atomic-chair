@@ -11,3 +11,11 @@ class Hero(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
+
+
+class Terrain(pygame.sprite.Sprite):
+    """Simple sprite for terrain and environment."""
+    def __init__(self, x, y, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
