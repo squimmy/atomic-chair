@@ -3,15 +3,23 @@ import random
 import pygame
 import entities
 import assets
+import controls
 
 
 def main():
     """Initialise the game and run the main game loop."""
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
+    input_manager = controls.InputManager()
 
     asset_manager = assets.AssetManager()
-    hero = entities.Hero(100, 200, asset_manager.hero_sprite)
+    clock = pygame.time.Clock()
+
+    hero = entities.Hero(
+        100, 200,
+        asset_manager.hero_sprite,
+        input_manager,
+        clock)
     actors = pygame.sprite.Group()
     actors.add(hero)
 
@@ -24,12 +32,15 @@ def main():
                 random.choice(asset_manager.terrain_sprites)))
 
     while True:
+        clock.tick(60)
+        for event in pygame.event.get():
+            input_manager.handle_event(event)
+            if event.type == pygame.QUIT:
+                return
+        actors.update()
         terrain.draw(screen)
         actors.draw(screen)
         pygame.display.flip()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
 
 
 if __name__ == "__main__":
