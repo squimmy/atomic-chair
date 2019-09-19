@@ -13,6 +13,11 @@ def main():
     input_manager = controls.InputManager()
 
     asset_manager = assets.AssetManager()
+    pygame.mouse.set_cursor(
+        asset_manager.cursor.size,
+        asset_manager.cursor.hotspot,
+        asset_manager.cursor.xormasks,
+        asset_manager.cursor.andmasks)
     clock = pygame.time.Clock()
 
     hero = entities.Hero(
