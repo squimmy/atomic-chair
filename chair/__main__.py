@@ -21,15 +21,18 @@ def main():
         asset_manager.cursor.andmasks)
     clock = pygame.time.Clock()
     projectiles = pygame.sprite.Group()
-    bullet_factory = entities.BulletFactory(clock, asset_manager.bullet, 1000)
+    projectile_manager = entities.ProjectileManager(
+        projectiles,
+        clock,
+        asset_manager.bullet,
+        1000)
 
     hero = entities.Hero(
         100, 200,
         asset_manager.hero_sprite,
         input_manager,
         clock,
-        projectiles,
-        bullet_factory)
+        projectile_manager)
     actors = pygame.sprite.Group()
     actors.add(hero)
 

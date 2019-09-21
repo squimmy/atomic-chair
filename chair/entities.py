@@ -10,7 +10,7 @@ TILE_SIZE = 32
 class Hero(pygame.sprite.Sprite):
     """The player-controlled actor."""
     def __init__(self, x, y, image, input_manager,
-                 clock, projectiles, bullet_factory):
+                 clock, projectile_manager):
         pygame.sprite.Sprite.__init__(self)
         self.image = image
         self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
@@ -18,8 +18,7 @@ class Hero(pygame.sprite.Sprite):
         self.clock = clock
         self.inertia = pygame.math.Vector2()
         self.speed = 0.17
-        self.projectiles = projectiles
-        self.bullet_factory = bullet_factory
+        self.projectile_manager = projectile_manager
 
     def update(self):
         """Update the player position depending on player input. sub-pixel
@@ -40,11 +39,10 @@ class Hero(pygame.sprite.Sprite):
             rel_y = target_y - self.rect.y
             direction = Vector2(rel_x, rel_y)
             direction.scale_to_length(0.25)
-            bullet = self.bullet_factory.make_bullet(
+            self.projectile_manager.add_bullet(
                 self.rect.x,
                 self.rect.y,
                 direction)
-            self.projectiles.add(bullet)
 
 
 class Baddie(pygame.sprite.Sprite):
@@ -82,18 +80,19 @@ class Projectile(pygame.sprite.Sprite):
             self.inertia.y -= math.copysign(1, self.inertia.y)
 
 
-class BulletFactory:
-    """Class to simplify the creation of bullets."""
-    def __init__(self, clock, default_image, default_lifetime):
+class ProjectileManager:
+    """Class to simplify the handling of projectiles."""
+    def __init__(self, projectiles, clock, bullet_image, bullet_lifetime):
         self.clock = clock
-        self.default_image = default_image
-        self.default_lifetime = default_lifetime
+        self.projectiles = projectiles
+        self.bullet_image = bullet_image
+        self.bullet_lifetime = bullet_lifetime
 
-    def make_bullet(self, x, y, velocity, image=None, lifetime=None):
-        """Create a default bullet."""
-        img = image or self.default_image
-        life = lifetime or self.default_lifetime
-        return Projectile(x, y, img, velocity, life, self.clock)
+    def add_bullet(self, x, y, velocity, image=None, lifetime=None):
+        """Create a default bullet and add it to the projectile group."""
+        img = image or self.bullet_image
+        life = lifetime or self.bullet_lifetime
+        self.projectiles.add(Projectile(x, y, img, velocity, life, self.clock))
 
 
 class Terrain(pygame.sprite.Sprite):
