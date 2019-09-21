@@ -19,12 +19,16 @@ def main():
         asset_manager.cursor.xormasks,
         asset_manager.cursor.andmasks)
     clock = pygame.time.Clock()
+    projectiles = pygame.sprite.Group()
+    bullet_factory = entities.BulletFactory(clock, asset_manager.bullet, 1000)
 
     hero = entities.Hero(
         100, 200,
         asset_manager.hero_sprite,
         input_manager,
-        clock)
+        clock,
+        projectiles,
+        bullet_factory)
     actors = pygame.sprite.Group()
     actors.add(hero)
 
@@ -38,13 +42,16 @@ def main():
 
     while True:
         clock.tick(60)
+        input_manager.reset()
         for event in pygame.event.get():
             input_manager.handle_event(event)
             if event.type == pygame.QUIT:
                 return
         actors.update()
+        projectiles.update()
         terrain.draw(screen)
         actors.draw(screen)
+        projectiles.draw(screen)
         pygame.display.flip()
 
 
