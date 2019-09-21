@@ -47,6 +47,14 @@ class Hero(pygame.sprite.Sprite):
             self.projectiles.add(bullet)
 
 
+class Baddie(pygame.sprite.Sprite):
+    """Base class for baddies."""
+    def __init__(self, x, y, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
+
+
 class Projectile(pygame.sprite.Sprite):
     """A projectile that will move in a straight line for a specified time."""
     def __init__(self, x, y, image, velocity, lifetime, clock):

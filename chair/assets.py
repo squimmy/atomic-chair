@@ -10,6 +10,7 @@ class AssetManager:
         self.hero_sprite = load_image("images/hero.png")
         self._terrain_sprite = load_image("images/desert.png")
         self.bullet = load_image("images/bullet.png")
+        self.goblin = load_image("images/goblin.png")
         xormasks, andmasks = create_cursor()
         self.cursor = CursorData((16, 16), (8, 8), xormasks, andmasks)
         self.terrain_sprites = [
