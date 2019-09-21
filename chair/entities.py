@@ -32,6 +32,33 @@ class Hero(pygame.sprite.Sprite):
             self.inertia.y -= math.copysign(1, self.inertia.y)
 
 
+class Projectile(pygame.sprite.Sprite):
+    """A projectile that will move in a straight line for a specified time."""
+    def __init__(self, x, y, image, velocity, lifetime, clock):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
+        self.velocity = velocity
+        self.lifetime = lifetime
+        self.clock = clock
+        self.inertia = pygame.math.Vector2()
+
+    def update(self):
+        """Move the projectile and reduce its lifespan."""
+        delta_t = self.clock.get_time()
+        self.lifetime -= delta_t
+        if self.lifetime <= 0:
+            self.kill()
+        motion = self.velocity * delta_t
+        self.inertia += motion
+        while math.fabs(self.inertia.x) >= 1:
+            self.rect.x += self.inertia.x
+            self.inertia.x -= math.copysign(1, self.inertia.x)
+        while math.fabs(self.inertia.y) >= 1:
+            self.rect.y += self.inertia.y
+            self.inertia.y -= math.copysign(1, self.inertia.y)
+
+
 class Terrain(pygame.sprite.Sprite):
     """Simple sprite for terrain and environment."""
     def __init__(self, x, y, image):
