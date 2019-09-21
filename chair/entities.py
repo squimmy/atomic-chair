@@ -82,9 +82,15 @@ class Projectile(pygame.sprite.Sprite):
 
 class ProjectileManager:
     """Class to simplify the handling of projectiles."""
-    def __init__(self, projectiles, clock, bullet_image, bullet_lifetime):
-        self.clock = clock
+    def __init__(self,
+                 projectiles,
+                 clock,
+                 sound_manager,
+                 bullet_image,
+                 bullet_lifetime):
         self.projectiles = projectiles
+        self.clock = clock
+        self.sound_manager = sound_manager
         self.bullet_image = bullet_image
         self.bullet_lifetime = bullet_lifetime
 
@@ -93,6 +99,7 @@ class ProjectileManager:
         img = image or self.bullet_image
         life = lifetime or self.bullet_lifetime
         self.projectiles.add(Projectile(x, y, img, velocity, life, self.clock))
+        self.sound_manager.play_shoot()
 
 
 class Terrain(pygame.sprite.Sprite):

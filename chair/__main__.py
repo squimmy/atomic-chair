@@ -4,6 +4,7 @@ import math
 import pygame
 import entities
 import assets
+import audio
 import controls
 
 
@@ -20,10 +21,12 @@ def main():
         asset_manager.cursor.xormasks,
         asset_manager.cursor.andmasks)
     clock = pygame.time.Clock()
+    sound_manager = audio.SoundManager()
     projectiles = pygame.sprite.Group()
     projectile_manager = entities.ProjectileManager(
         projectiles,
         clock,
+        sound_manager,
         asset_manager.bullet,
         1000)
 
