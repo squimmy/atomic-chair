@@ -1,5 +1,4 @@
 """Game entities."""
-import math
 import pygame
 from pygame import Rect
 from pygame.math import Vector2
@@ -7,16 +6,34 @@ from pygame.math import Vector2
 TILE_SIZE = 32
 
 
-class Hero(pygame.sprite.Sprite):
+class Motile(pygame.sprite.Sprite):
+    """Any sprite capable of movement."""
+    def __init__(self, x, y, image):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.pos = pygame.math.Vector2(x, y)
+        self._offset_x = self.image.get_width() / 2
+        self._offset_y = self.image.get_height() / 2
+        self.rect = Rect(
+            x - self._offset_x,
+            y - self._offset_y,
+            self.image.get_width(),
+            self.image.get_height())
+
+    def update_position(self, vec):
+        """Update the position of the sprite and align the image to it."""
+        self.pos.update(vec)
+        self.rect.x = self.pos.x - self._offset_x
+        self.rect.y = self.pos.y - self._offset_y
+
+
+class Hero(Motile):
     """The player-controlled actor."""
     def __init__(self, x, y, image, input_manager,
                  clock, projectile_manager):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = image
-        self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
+        Motile.__init__(self, x, y, image)
         self.input_manager = input_manager
         self.clock = clock
-        self.pos = Vector2(x, y)
         self.speed = 0.25
         self.projectile_manager = projectile_manager
 
@@ -26,21 +43,15 @@ class Hero(pygame.sprite.Sprite):
         so that fractional input can be aggregated over multiple frames."""
         input_vector = self.input_manager.get_direction()
         input_vector *= self.clock.get_time() * self.speed
-        self.pos += input_vector
-        self.rect.x = self.pos.x
-        self.rect.y = self.pos.y
+        self.update_position(self.pos + input_vector)
         if self.input_manager.clicked_buttons[1]:
-            center_x, center_y = self._get_center()
-            target_x, target_y = self.input_manager.mouse_pos
-            rel_x = target_x - center_x
-            rel_y = target_y - center_y
-            direction = Vector2(rel_x, rel_y)
+            target = Vector2(self.input_manager.mouse_pos)
+            direction = target - self.pos
             direction.scale_to_length(0.5)
-            self.projectile_manager.add_bullet(center_x, center_y, direction)
-
-    def _get_center(self):
-        return (self.rect.x + TILE_SIZE / 2,
-                self.rect.y + TILE_SIZE / 2)
+            self.projectile_manager.add_bullet(
+                self.pos.x,
+                self.pos.y,
+                direction)
 
 
 class Baddie(pygame.sprite.Sprite):
@@ -51,20 +62,13 @@ class Baddie(pygame.sprite.Sprite):
         self.rect = Rect(x, y, TILE_SIZE, TILE_SIZE)
 
 
-class Projectile(pygame.sprite.Sprite):
+class Projectile(Motile):
     """A projectile that will move in a straight line for a specified time."""
     def __init__(self, x, y, image, velocity, lifetime, clock):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = image
-        self.rect = Rect(
-            x - image.get_width() / 2,
-            y - image.get_height() / 2,
-            TILE_SIZE,
-            TILE_SIZE)
+        Motile.__init__(self, x, y, image)
         self.velocity = velocity
         self.lifetime = lifetime
         self.clock = clock
-        self.pos = pygame.math.Vector2(x, y)
 
     def update(self):
         """Move the projectile and reduce its lifespan."""
@@ -73,9 +77,7 @@ class Projectile(pygame.sprite.Sprite):
         if self.lifetime <= 0:
             self.kill()
         motion = self.velocity * delta_t
-        self.pos += motion
-        self.rect.x = self.pos.x
-        self.rect.y = self.pos.y
+        self.update_position(self.pos + motion)
 
 
 class ProjectileManager:
